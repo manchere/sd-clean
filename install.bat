@@ -44,7 +44,6 @@ if not exist "%PYTHON_EXE%" (
     echo Make sure Smode Compose is installed and this package
     echo is located in Smode's Packages/ directory.
     echo.
-    pause
     exit /b 1
 )
 
@@ -103,7 +102,6 @@ if %errorlevel% neq 0 (
     color 0C
     echo [ERROR] Failed to create the virtual environment.
     echo.
-    pause
     exit /b 1
 )
 echo [OK] Virtual environment created successfully (Python %PYTHON_VERSION%).
@@ -117,7 +115,6 @@ if %errorlevel% neq 0 (
     color 0C
     echo [ERROR] Failed to activate the virtual environment.
     echo.
-    pause
     exit /b 1
 )
 echo [OK] Virtual environment activated.
@@ -130,7 +127,6 @@ if %errorlevel% neq 0 (
     color 0C
     echo [ERROR] Pip upgrade failed.
     echo.
-    pause
     exit /b 1
 )
 echo [OK] pip updated.
@@ -146,7 +142,6 @@ if not exist "requirements.txt" (
     echo [ERROR] requirements.txt file not found.
     echo Make sure you are in the correct directory.
     echo.
-    pause
     exit /b 1
 )
 
@@ -172,7 +167,6 @@ if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Dependency installation failed.
     echo.
-    pause
     exit /b 1
 )
 
@@ -188,7 +182,6 @@ if %errorlevel% neq 0 (
     echo.
     echo [ERROR] easy-dwpose installation failed.
     echo.
-    pause
     exit /b 1
 )
 echo [OK] easy-dwpose installed.
@@ -203,7 +196,6 @@ if %errorlevel% neq 0 (
     echo.
     echo [ERROR] insightface installation failed.
     echo.
-    pause
     exit /b 1
 )
 REM Downgrade numpy for insightface compatibility (scipy/opencv remain compatible)
@@ -213,7 +205,6 @@ if %errorlevel% neq 0 (
     echo.
     echo [ERROR] numpy downgrade failed.
     echo.
-    pause
     exit /b 1
 )
 echo [OK] insightface installed (numpy 1.26.4 for compatibility).
@@ -272,7 +263,6 @@ if %errorlevel% neq 0 (
     echo [ERROR] Installation test failed.
     echo Check the error messages above.
     echo.
-    pause
     exit /b 1
 )
 
