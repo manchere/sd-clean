@@ -44,6 +44,7 @@ if not exist "%PYTHON_EXE%" (
     echo Make sure Smode Compose is installed and this package
     echo is located in Smode's Packages/ directory.
     echo.
+    pause
     exit /b 1
 )
 
@@ -105,6 +106,7 @@ if %errorlevel% neq 0 (
     color 0C
     echo [ERROR] Failed to create the virtual environment.
     echo.
+    pause
     exit /b 1
 )
 echo [OK] Virtual environment created successfully (Python %PYTHON_VERSION%).
@@ -118,15 +120,23 @@ if %errorlevel% neq 0 (
     color 0C
     echo [ERROR] Failed to activate the virtual environment.
     echo.
+    pause
     exit /b 1
 )
 echo [OK] Virtual environment activated.
 
-REM Mettre a jour pip (apres activation, python = venv Python 3.11.9)
+REM Update pip (after activation, python = venv Python 3.11.9)
 echo.
-echo [INFO] Mise a jour de pip...
+echo [INFO] Updating pip...
 python -m pip install --upgrade pip --quiet
-echo [OK] pip mis a jour.
+if %errorlevel% neq 0 (
+    color 0C
+    echo [ERROR] Pip upgrade failed.
+    echo.
+    pause
+    exit /b 1
+)
+echo [OK] pip updated.
 
 echo.
 echo ============================================================================
@@ -139,6 +149,7 @@ if not exist "requirements.txt" (
     echo [ERROR] requirements.txt file not found.
     echo Make sure you are in the correct directory.
     echo.
+    pause
     exit /b 1
 )
 
@@ -162,52 +173,77 @@ python -m pip install -r requirements.txt --verbose
 if %errorlevel% neq 0 (
     color 0C
     echo.
-    echo [ERREUR] Echec de l'installation des dependances.
+    echo [ERROR] Dependency installation failed.
     echo.
+    pause
     exit /b 1
 )
 
 echo.
-echo [OK] Toutes les dependances installees avec succes.
+echo [OK] All dependencies installed successfully.
 
-REM Installer easy-dwpose separement (conflit artificiel huggingface_hub<0.25, API inchangee)
+REM Install easy-dwpose separately (workaround for huggingface_hub<0.25 conflict, API unchanged)
 echo.
-echo [INFO] Installation de easy-dwpose (--no-deps)...
+echo [INFO] Installing easy-dwpose (--no-deps)...
 python -m pip install easy-dwpose==1.0.2 --no-deps --quiet
-echo [OK] easy-dwpose installe.
+if %errorlevel% neq 0 (
+    color 0C
+    echo.
+    echo [ERROR] easy-dwpose installation failed.
+    echo.
+    pause
+    exit /b 1
+)
+echo [OK] easy-dwpose installed.
 
-REM Installer insightface depuis wheel pre-compile Windows (evite besoin de MSVC)
-REM Requis pour IP-Adapter FaceID. Incompatible avec numpy 2.x.
+REM Install insightface from prebuilt Windows wheel (avoids MSVC build)
+REM Required for IP-Adapter FaceID. Incompatible with numpy 2.x.
 echo.
-echo [INFO] Installation de insightface (IP-Adapter FaceID)...
+echo [INFO] Installing insightface (IP-Adapter FaceID)...
 python -m pip install "https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp311-cp311-win_amd64.whl" --quiet
-REM Downgrade numpy pour compatibilite insightface (scipy/opencv restent compatibles)
+if %errorlevel% neq 0 (
+    color 0C
+    echo.
+    echo [ERROR] insightface installation failed.
+    echo.
+    pause
+    exit /b 1
+)
+REM Downgrade numpy for insightface compatibility (scipy/opencv remain compatible)
 python -m pip install "numpy==1.26.4" --quiet
-echo [OK] insightface installe (numpy 1.26.4 pour compatibilite).
+if %errorlevel% neq 0 (
+    color 0C
+    echo.
+    echo [ERROR] numpy downgrade failed.
+    echo.
+    pause
+    exit /b 1
+)
+echo [OK] insightface installed (numpy 1.26.4 for compatibility).
 
-REM Verifier que PyTorch et CUDA fonctionnent
+REM Verify that PyTorch and CUDA work
 echo.
-echo [INFO] Verification de PyTorch et CUDA...
-python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA disponible: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"N/A\"}')"
+echo [INFO] Verifying PyTorch and CUDA...
+python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"N/A\"}')"
 
 if %errorlevel% neq 0 (
     color 0E
     echo.
-    echo [ATTENTION] PyTorch ou CUDA ne semble pas fonctionner correctement.
-    echo Verifiez votre installation CUDA et les drivers NVIDIA.
-    echo [INFO] L'installation continue...
+    echo [WARNING] PyTorch or CUDA does not appear to be working correctly.
+    echo Check your CUDA installation and NVIDIA drivers.
+    echo [INFO] Installation will continue...
 ) else (
-    echo [OK] PyTorch et CUDA fonctionnent correctement.
+    echo [OK] PyTorch and CUDA are working correctly.
 )
 
 echo.
 echo ============================================================================
-echo [Etape 3/4] Configuration des binaires CUDA et headers Python
+echo [Step 3/4] Configuring CUDA binaries and Python headers
 echo ============================================================================
 echo.
 
-echo [INFO] Configuration pour torch.compile() et Triton...
-echo [INFO] Cette etape copie les outils CUDA et headers Python necessaires.
+echo [INFO] Configuring torch.compile() and Triton...
+echo [INFO] This step copies CUDA tools and required Python headers.
 echo.
 
 python setup_venv.py
@@ -215,16 +251,16 @@ python setup_venv.py
 if %errorlevel% neq 0 (
     color 0E
     echo.
-    echo [ATTENTION] La configuration des binaires a echoue partiellement.
-    echo StreamDiffusion fonctionnera quand meme, mais torch.compile^(^) pourrait ne pas marcher.
-    echo [INFO] L'installation continue...
+    echo [WARNING] Binary configuration failed partially.
+    echo StreamDiffusion will still run, but torch.compile() may not.
+    echo [INFO] Installation will continue...
 ) else (
-    echo [OK] Binaires CUDA et headers Python configures.
+    echo [OK] CUDA binaries and Python headers configured.
 )
 
 echo.
 echo ============================================================================
-echo [Etape 4/4] Verification de l'installation
+echo [Step 4/4] Installation verification
 echo ============================================================================
 echo.
 
@@ -239,6 +275,7 @@ if %errorlevel% neq 0 (
     echo [ERROR] Installation test failed.
     echo Check the error messages above.
     echo.
+    pause
     exit /b 1
 )
 
@@ -269,6 +306,6 @@ echo ===========================================================================
 color 0A
 echo.
 echo Closing script.
+endlocal
 exit /b 0
 
-endlocal
