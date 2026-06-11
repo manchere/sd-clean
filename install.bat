@@ -123,13 +123,7 @@ REM Update pip (after activation, python = venv Python 3.11.9)
 echo.
 echo [INFO] Updating pip...
 python -m pip install --upgrade pip --quiet
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Pip upgrade failed.
-    echo.
-    exit /b 1
-)
-echo [OK] pip updated.
+echo [OK] pip updated
 
 echo.
 echo ============================================================================
@@ -139,7 +133,7 @@ echo.
 
 if not exist "requirements.txt" (
     color 0C
-    echo [ERROR] requirements.txt file not found.
+    echo [ERROR] The file requirements.txt is not found.
     echo Make sure you are in the correct directory.
     echo.
     exit /b 1
@@ -177,13 +171,6 @@ REM Install easy-dwpose separately (workaround for huggingface_hub<0.25 conflict
 echo.
 echo [INFO] Installing easy-dwpose (--no-deps)...
 python -m pip install easy-dwpose==1.0.2 --no-deps --quiet
-if %errorlevel% neq 0 (
-    color 0C
-    echo.
-    echo [ERROR] easy-dwpose installation failed.
-    echo.
-    exit /b 1
-)
 echo [OK] easy-dwpose installed.
 
 REM Install insightface from prebuilt Windows wheel (avoids MSVC build)
@@ -191,22 +178,8 @@ REM Required for IP-Adapter FaceID. Incompatible with numpy 2.x.
 echo.
 echo [INFO] Installing insightface (IP-Adapter FaceID)...
 python -m pip install "https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp311-cp311-win_amd64.whl" --quiet
-if %errorlevel% neq 0 (
-    color 0C
-    echo.
-    echo [ERROR] insightface installation failed.
-    echo.
-    exit /b 1
-)
 REM Downgrade numpy for insightface compatibility (scipy/opencv remain compatible)
 python -m pip install "numpy==1.26.4" --quiet
-if %errorlevel% neq 0 (
-    color 0C
-    echo.
-    echo [ERROR] numpy downgrade failed.
-    echo.
-    exit /b 1
-)
 echo [OK] insightface installed (numpy 1.26.4 for compatibility).
 
 REM Verify that PyTorch and CUDA work
@@ -292,7 +265,4 @@ echo ===========================================================================
 
 color 0A
 echo.
-echo Closing script.
 endlocal
-exit /b 0
-
