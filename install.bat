@@ -63,18 +63,15 @@ if "%CUDA_FOUND%"=="0" (
     if exist "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\bin\nvcc.exe" set "CUDA_FOUND=1"
 )
 if "%CUDA_FOUND%"=="0" (
-    echo [INFO] CUDA Toolkit not detected. Installing via winget...
-    winget install Nvidia.CUDA --version 12.9 --accept-source-agreements --accept-package-agreements --silent
-    if !errorlevel! equ 0 (
-        echo [OK] CUDA Toolkit 12.9.1 installed successfully.
-        echo [INFO] Note: a reboot may be required for CUDA_PATH to become active.
-    ) else (
-        color 0E
-        echo [WARNING] Automatic CUDA Toolkit installation failed.
-        echo    Install it manually: https://developer.nvidia.com/cuda-toolkit-archive
-        echo    Installation will continue, but torch.compile() may not work.
-        echo.
-    )
+    color 0E
+    echo [WARNING] CUDA Toolkit 12.9 not detected.
+    echo    torch.compile() and Triton will not work without it.
+    echo    Install manually if needed:
+    echo      winget install Nvidia.CUDA --version 12.9
+    echo    or: https://developer.nvidia.com/cuda-toolkit-archive
+    echo    Then re-run this installer.
+    echo.
+    color 0A
 ) else (
     echo [OK] CUDA Toolkit detected.
 )
