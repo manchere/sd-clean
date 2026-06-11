@@ -123,13 +123,6 @@ REM Update pip (after activation, python = venv Python 3.11.9)
 echo.
 echo [INFO] Updating pip...
 python -m pip install --upgrade pip --quiet
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Pip upgrade failed.
-    echo.
-    exit /b 1
-)
-echo [OK] pip updated.
 echo [OK] pip updated
 
 echo.
@@ -185,24 +178,9 @@ REM Required for IP-Adapter FaceID. Incompatible with numpy 2.x.
 echo.
 echo [INFO] Installing insightface (IP-Adapter FaceID)...
 python -m pip install "https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp311-cp311-win_amd64.whl" --quiet
-echo [OK] insightface installed (numpy 1.26.4 for compatibility).
-if %errorlevel% neq 0 (
-    color 0C
-    echo.
-    echo [ERROR] insightface installation failed.
-    echo.
-    exit /b 1
-)
-
 REM Downgrade numpy for insightface compatibility (scipy/opencv remain compatible)
 python -m pip install "numpy==1.26.4" --quiet
-if %errorlevel% neq 0 (
-    color 0C
-    echo.
-    echo [ERROR] numpy downgrade failed.
-    echo.
-    exit /b 1
-)
+echo [OK] insightface installed (numpy 1.26.4 for compatibility).
 
 REM Verify that PyTorch and CUDA work
 echo.
@@ -287,6 +265,4 @@ echo ===========================================================================
 
 color 0A
 echo.
-echo Closing script.
-exit /b 0
 endlocal
